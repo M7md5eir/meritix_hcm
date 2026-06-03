@@ -1,0 +1,229 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "EVALU.######",
+ "creation": "2026-05-13 07:56:43.809328",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "tab1_sec1",
+  "tab1_sec1_col1",
+  "evaluation_form",
+  "tab1_sec1_col2",
+  "evaluation_period",
+  "tab1_sec1_col3",
+  "evaluation_factor",
+  "evaluation_factor_doctype",
+  "tab1_sec1_col4",
+  "tab1_sec2",
+  "tab1_sec2_col1",
+  "evaluation_subject",
+  "tab1_sec2_col2",
+  "organization",
+  "tab1_sec2_col3",
+  "tab1_sec2_col4",
+  "tab1_sec3",
+  "tab1_sec3_col1",
+  "evaluation_record",
+  "tab1_sec4",
+  "tab1_sec4_col1",
+  "tab1_sec4_col2",
+  "tab1_sec4_col3",
+  "tab1_sec4_col4",
+  "score",
+  "final_score",
+  "tab1_sec9",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "tab1_sec1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "tab1_sec1_col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "evaluation_form",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Evaluation Form",
+   "options": "Evaluation Form"
+  },
+  {
+   "fieldname": "tab1_sec1_col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "evaluation_period",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Evaluation Period",
+   "options": "Period"
+  },
+  {
+   "fieldname": "tab1_sec1_col3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "evaluation_factor",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Evaluation Factor",
+   "options": "Evaluation Factor"
+  },
+  {
+   "fetch_from": "evaluation_factor.doctype_list",
+   "fieldname": "evaluation_factor_doctype",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Evaluation Factor Doctype",
+   "options": "DocType",
+   "print_hide": 1,
+   "read_only": 1,
+   "report_hide": 1
+  },
+  {
+   "fieldname": "tab1_sec1_col4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "tab1_sec2_col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "evaluation_subject",
+   "fieldtype": "Dynamic Link",
+   "in_list_view": 1,
+   "label": "Evaluation Subject",
+   "options": "evaluation_factor_doctype"
+  },
+  {
+   "fieldname": "tab1_sec2_col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "organization",
+   "fieldtype": "Structure Link",
+   "hidden": 1,
+   "in_standard_filter": 1,
+   "label": "Organization",
+   "options": "Organization",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tab1_sec2_col3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec2_col4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec3",
+   "fieldtype": "Section Break",
+   "hide_border": 1
+  },
+  {
+   "fieldname": "tab1_sec3_col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "evaluation_record",
+   "fieldtype": "Table",
+   "options": "Evaluation Record"
+  },
+  {
+   "fieldname": "tab1_sec4",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "tab1_sec4_col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec4_col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec4_col3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec4_col4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "score",
+   "fieldtype": "Percent",
+   "label": "Score",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "final_score",
+   "fieldtype": "Percent",
+   "label": "Final Score",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tab1_sec9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Evaluation",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-06-02 23:52:40.826315",
+ "modified_by": "Administrator",
+ "module": "Evaluation",
+ "name": "Evaluation",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "show_title_field_in_link": 1,
+ "sort_field": "name",
+ "sort_order": "ASC",
+ "states": [],
+ "title_field": "evaluation_subject",
+ "translated_doctype": 1
+}

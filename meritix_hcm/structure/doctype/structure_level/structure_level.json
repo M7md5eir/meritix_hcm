@@ -1,0 +1,121 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "prompt",
+ "creation": "2026-05-13 13:30:19.911136",
+ "default_view": "List",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "tab1_sec1",
+  "tab1_sec1_col1",
+  "level",
+  "tab1_sec1_col2",
+  "tab1_sec2",
+  "applies_to",
+  "tab1_sec3",
+  "tab1_sec3_col1",
+  "active",
+  "enabled_date",
+  "disabled_date",
+  "tab1_sec3_col2"
+ ],
+ "fields": [
+  {
+   "fieldname": "tab1_sec1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "tab1_sec1_col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "level",
+   "fieldtype": "Autocomplete",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Level",
+   "non_negative": 1,
+   "options": "01\n02\n03\n04\n05\n06\n07\n08\n09\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25"
+  },
+  {
+   "fieldname": "tab1_sec1_col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "default": "0",
+   "description": "the status changes automatically based on the below dates",
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Active",
+   "read_only": 1
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "fieldname": "enabled_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Enabled Date"
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "fieldname": "disabled_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Disabled Date"
+  },
+  {
+   "fieldname": "tab1_sec3",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "applies_to",
+   "fieldtype": "Table",
+   "label": "Applying",
+   "options": "Structure DF Creation"
+  },
+  {
+   "fieldname": "tab1_sec3_col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec3_col2",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-02 19:59:55.158908",
+ "modified_by": "Administrator",
+ "module": "Structure",
+ "name": "Structure Level",
+ "naming_rule": "Set by user",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "level",
+ "sort_order": "ASC",
+ "states": [],
+ "track_changes": 1,
+ "translated_doctype": 1
+}

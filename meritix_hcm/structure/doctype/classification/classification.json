@@ -1,0 +1,84 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "prompt",
+ "creation": "2026-05-04 09:30:50.947820",
+ "default_view": "List",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "tab1_sec1",
+  "tab1_sec1_col1",
+  "active",
+  "enabled_date",
+  "disabled_date",
+  "tab1_sec1_col2"
+ ],
+ "fields": [
+  {
+   "allow_in_quick_entry": 1,
+   "default": "0",
+   "description": "the status changes automatically based on the below dates",
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Active",
+   "read_only": 1
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "fieldname": "enabled_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Enabled Date"
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "fieldname": "disabled_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Disabled Date"
+  },
+  {
+   "fieldname": "tab1_sec1_col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec1_col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec1",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-02 19:39:34.393262",
+ "modified_by": "Administrator",
+ "module": "Structure",
+ "name": "Classification",
+ "naming_rule": "Set by user",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "name",
+ "sort_order": "ASC",
+ "states": []
+}

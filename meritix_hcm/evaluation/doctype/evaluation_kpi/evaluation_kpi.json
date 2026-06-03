@@ -1,0 +1,79 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "prompt",
+ "creation": "2026-05-26 18:58:17.374417",
+ "default_view": "List",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "tab1_sec1",
+  "tab1_sec1_col1",
+  "reverse_calc",
+  "uom",
+  "tab1_sec1_col2"
+ ],
+ "fields": [
+  {
+   "fieldname": "tab1_sec1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "tab1_sec1_col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "default": "0",
+   "fieldname": "reverse_calc",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Reverse Calc"
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "fieldname": "uom",
+   "fieldtype": "Autocomplete",
+   "in_list_view": 1,
+   "label": "UOM",
+   "options": "#\n%\n$\nDay(s)\nMonth(s)\nHour(s)"
+  },
+  {
+   "fieldname": "tab1_sec1_col2",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-02 20:43:28.013327",
+ "modified_by": "Administrator",
+ "module": "Evaluation",
+ "name": "Evaluation KPI",
+ "naming_rule": "Set by user",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "import": 1,
+   "mask": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "name",
+ "sort_order": "ASC",
+ "states": [],
+ "translated_doctype": 1
+}

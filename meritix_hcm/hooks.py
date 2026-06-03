@@ -87,6 +87,8 @@ app_license = "unlicense"
 
 # before_install = "meritix_hcm.install.before_install"
 # after_install = "meritix_hcm.install.after_install"
+after_install = "meritix_hcm.structure.cascade_custom_fields.sync_app"
+after_migrate = "meritix_hcm.structure.cascade_custom_fields.sync_app"
 
 # Uninstallation
 # ------------
@@ -145,6 +147,24 @@ app_license = "unlicense"
 # 		"on_trash": "method"
 # 	}
 # }
+
+
+doc_events = {
+	"Custom Field": {
+		"before_save": "meritix_hcm.structure.cascade_custom_fields.protect_system_generated_cf",
+		"on_trash": "meritix_hcm.structure.cascade_custom_fields.protect_system_generated_cf",
+	},
+	"Employee": {
+		"before_save": "meritix_hcm.structure.cascade_custom_fields.fill_on_save",
+	},
+	"Position": {
+		"before_save": "meritix_hcm.structure.cascade_custom_fields.fill_on_save",
+		"on_update": "meritix_hcm.structure.cascade_custom_fields.propagate_position_change",
+	},
+	"Employee Appraisal": {
+		"before_save": "meritix_hcm.structure.cascade_custom_fields.fill_on_save",
+	},
+}
 
 # Scheduled Tasks
 # ---------------
@@ -256,3 +276,14 @@ app_license = "unlicense"
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
 
+doctype_list_js = {
+    "Employee": "public/js/employee.js"
+}
+
+scheduler_events = {
+    "cron": {
+        "0 0 * * *": [
+            "meritix_hcm.meritix_hcm.lifecycle.update_status_daily",
+        ]
+    }
+}

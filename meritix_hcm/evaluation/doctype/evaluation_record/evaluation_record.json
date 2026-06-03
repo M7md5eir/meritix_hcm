@@ -1,0 +1,168 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{DD}{MM}{YY}-{######}",
+ "creation": "2026-05-26 18:55:01.271238",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "tab1_sec1",
+  "tab1_sec1_col1",
+  "kpi",
+  "tab1_sec1_col2",
+  "reverse_calc",
+  "tab1_sec2",
+  "tab1_sec2_col1",
+  "uom",
+  "tab1_sec2_col2",
+  "planned",
+  "tab1_sec2_col3",
+  "achieved",
+  "tab1_sec2_col4",
+  "percent",
+  "tab1_sec2_col5",
+  "weight",
+  "tab1_sec2_col6",
+  "score"
+ ],
+ "fields": [
+  {
+   "fieldname": "tab1_sec1",
+   "fieldtype": "Section Break",
+   "hide_border": 1
+  },
+  {
+   "fieldname": "tab1_sec1_col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 4,
+   "fieldname": "kpi",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "KPI",
+   "options": "Evaluation KPI"
+  },
+  {
+   "fieldname": "tab1_sec1_col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "default": "0",
+   "fetch_from": "kpi.reverse_calc",
+   "fieldname": "reverse_calc",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Reverse Calc",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tab1_sec2",
+   "fieldtype": "Section Break",
+   "hide_border": 1
+  },
+  {
+   "fieldname": "tab1_sec2_col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fetch_from": "kpi.uom",
+   "fieldname": "uom",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "UOM",
+   "options": "UOM",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tab1_sec2_col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "planned",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Planned",
+   "precision": "2"
+  },
+  {
+   "fieldname": "tab1_sec2_col3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "achieved",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Achieved",
+   "precision": "2"
+  },
+  {
+   "fieldname": "tab1_sec2_col4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "percent",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Percent",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tab1_sec2_col5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "weight",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Weight",
+   "precision": "2"
+  },
+  {
+   "fieldname": "tab1_sec2_col6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "score",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Score",
+   "precision": "2",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-06-02 20:41:40.873036",
+ "modified_by": "Administrator",
+ "module": "Evaluation",
+ "name": "Evaluation Record",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "name",
+ "sort_order": "ASC",
+ "states": []
+}

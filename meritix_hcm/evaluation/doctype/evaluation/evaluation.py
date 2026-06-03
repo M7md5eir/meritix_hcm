@@ -1,0 +1,111 @@
+# Copyright (c) 2026, Mohamed Kheir and contributors
+# For license information, please see license.txt
+
+import frappe
+from frappe.model.document import Document
+from meritix_hcm.structure import cascade_custom_fields
+
+
+class Evaluation(Document):
+    def before_save(self):
+        self.set_organization_from_evaluation_subject()
+        cascade_custom_fields.fill(self, self.doctype)
+
+        # منقول: حذف الصفوف الفاضية من الـ child table
+        self.evaluation_record = [row for row in self.evaluation_record if row.kpi]
+
+        # منقول: لو مفيش rows يصفر الـ score
+        if not self.evaluation_record:
+            self.score = 0
+            self.final_score = 0
+            return
+
+        # منقول: جيب الـ formula والـ weight من Evaluation Factor بناءً على evaluation_form و evaluation_factor
+        factor_data = frappe.db.get_value(
+            'Evaluation Factor Setup',
+            {
+                'parent': self.evaluation_form,
+                'parentfield': 'evaluation_factor_setup',
+                'factor': self.evaluation_factor
+            },
+            ['formula', 'weight'],
+            as_dict=True
+        )
+
+        # منقول: لو مفيش formula يصفر الـ score
+        if not factor_data or not factor_data.formula:
+            self.score = 0
+            self.final_score = 0
+            return
+
+        # منقول: حساب الـ score لكل row في الـ child table
+        total_score = 0
+
+        for row in self.evaluation_record:
+            if not row.planned or not row.achieved or not row.weight:
+                row.percent = 0
+                row.score = 0
+                continue
+
+            # منقول: حساب الـ percent بناءً على reverse_calc
+            if row.reverse_calc:
+                row.percent = (row.planned / row.achieved) * 100
+            else:
+                row.percent = (row.achieved / row.planned) * 100
+
+            # منقول: تطبيق الـ formula على الـ percent
+            formula = factor_data.formula.replace('percent', str(row.percent))
+            score = frappe.safe_eval(formula)
+            row.score = (row.weight * score) / 100
+
+            total_score += row.score or 0
+
+        # منقول: حساب الـ score الإجمالي و final_score
+        self.score = total_score
+        self.final_score = (total_score * factor_data.weight) / 100
+
+    def on_submit(self):
+        cascade_custom_fields.fill(self, self.doctype)
+        self.db_update()
+
+    def on_update_after_submit(self):
+        cascade_custom_fields.fill(self, self.doctype)
+        self.db_update()
+
+    def set_organization_from_evaluation_subject(self):
+        if not self.evaluation_subject or not self.evaluation_factor_doctype:
+            return
+
+        result = frappe.db.get_value(
+            self.evaluation_factor_doctype,
+            self.evaluation_subject,
+            ['name', 'organization'],
+            as_dict=True
+        )
+        if not result:
+            return
+
+        if self.evaluation_factor_doctype == 'Organization':
+            self.organization = result.get('name')
+        else:
+            self.organization = result.get('organization')
+
+
+@frappe.whitelist()
+@frappe.validate_and_sanitize_search_inputs
+def get_evaluation_factors(doctype, txt, searchfield, start, page_len, filters):
+    evaluation_form = filters.get('evaluation_form')
+    return frappe.db.sql("""
+        SELECT ef.name, ef.factor
+        FROM `tabEvaluation Factor` ef
+        INNER JOIN `tabEvaluation Factor Setup` efc ON efc.factor = ef.name
+        WHERE efc.parent = %(evaluation_form)s
+        AND efc.parentfield = 'evaluation_factor_setup'
+        AND (ef.name LIKE %(txt)s OR ef.factor LIKE %(txt)s)
+        LIMIT %(page_len)s OFFSET %(start)s
+    """, {
+        'evaluation_form': evaluation_form,
+        'txt': f'%{txt}%',
+        'page_len': page_len,
+        'start': start
+    })

@@ -1,0 +1,144 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "field:emp_id",
+ "creation": "2026-04-18 12:04:35.574035",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "tab1_sec1",
+  "tab1_sec1_col1",
+  "emp_id",
+  "emp_name",
+  "join_date",
+  "emp_img",
+  "tab1_sec1_col2",
+  "tab1_sec1_col3",
+  "tab1_sec2",
+  "tab1_sec2_col1",
+  "position",
+  "tab1_sec2_col2",
+  "job",
+  "organization",
+  "tab1_sec2_col3"
+ ],
+ "fields": [
+  {
+   "fieldname": "emp_id",
+   "fieldtype": "Data",
+   "label": "Emp ID",
+   "unique": 1
+  },
+  {
+   "fieldname": "emp_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Emp Name",
+   "unique": 1
+  },
+  {
+   "fieldname": "join_date",
+   "fieldtype": "Date",
+   "label": "Join Date"
+  },
+  {
+   "fieldname": "emp_img",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "Emp IMG"
+  },
+  {
+   "fieldname": "position",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Position",
+   "link_filters": "[[\"Position\",\"active\",\"=\",1]]",
+   "options": "Position"
+  },
+  {
+   "fetch_from": "position.job",
+   "fieldname": "job",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Job",
+   "options": "Job",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "position.organization",
+   "fieldname": "organization",
+   "fieldtype": "Structure Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Organization",
+   "options": "Organization",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tab1_sec1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "tab1_sec2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "tab1_sec2_col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec2_col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec1_col3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec1_col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec1_col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec2_col3",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "image_field": "emp_img",
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-08 16:20:25.996038",
+ "modified_by": "Administrator",
+ "module": "Structure",
+ "name": "Employee",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "emp_id",
+ "sort_order": "ASC",
+ "states": [],
+ "title_field": "emp_name"
+}

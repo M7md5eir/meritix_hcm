@@ -1,0 +1,129 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "prompt",
+ "creation": "2026-04-18 17:13:19.036863",
+ "default_view": "List",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "tab1_sec1",
+  "tab1_sec1_col1",
+  "job",
+  "classification",
+  "organization",
+  "tab1_sec1_col2",
+  "tab1_sec2",
+  "tab1_sec2_col1",
+  "active",
+  "enabled_date",
+  "disabled_date",
+  "tab1_sec2_col2"
+ ],
+ "fields": [
+  {
+   "fieldname": "job",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Job",
+   "link_filters": "[[\"Job\",\"active\",\"=\",1]]",
+   "options": "Job"
+  },
+  {
+   "fieldname": "organization",
+   "fieldtype": "Structure Link",
+   "in_standard_filter": 1,
+   "label": "Organization",
+   "link_filters": "[[\"Organization\",\"active\",\"=\",1]]",
+   "options": "Organization"
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "default": "0",
+   "description": "the status changes automatically based on the below dates",
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Active",
+   "read_only": 1
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "fieldname": "enabled_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Enabled Date"
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "fieldname": "disabled_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Disabled Date"
+  },
+  {
+   "fieldname": "classification",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Classification",
+   "link_filters": "[[\"Classification\",\"active\",\"=\",1]]",
+   "options": "Classification"
+  },
+  {
+   "fieldname": "tab1_sec1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "tab1_sec1_col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec1_col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec2_col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec2_col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab1_sec2",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-02 19:49:20.172050",
+ "modified_by": "Administrator",
+ "module": "Structure",
+ "name": "Position",
+ "naming_rule": "Set by user",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "name",
+ "sort_order": "ASC",
+ "states": [],
+ "translated_doctype": 1
+}
