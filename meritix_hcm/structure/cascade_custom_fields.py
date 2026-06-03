@@ -227,11 +227,12 @@ def ensure(structure_doc, target_row) -> None:
 	if not target_doctype:
 		return
 
-	label = structure_doc.structure if hasattr(structure_doc, "structure") else structure_doc.get("structure")
+	# label = the Structure Level name (which IS the label now)
+	label = structure_doc.name if hasattr(structure_doc, "name") else structure_doc.get("name")
 	if not label:
 		return
 
-	name = structure_doc.name if hasattr(structure_doc, "name") else structure_doc.get("name")
+	name = label  # name and label are the same field now
 
 	flags = _flags_from_row(row, target_doctype)
 	df = _field_definition(target_doctype, label, name, flags)
@@ -318,14 +319,14 @@ def _structure_target_pairs() -> list[tuple[dict, dict]]:
 	"""
 	rows = frappe.db.sql(
 		"""
-		SELECT s.name AS structure_name, s.structure, s.level,
+		SELECT s.name AS structure_name,
 			t.target_doctype, t.insert_after, t.hidden, t.in_list_view,
 			t.in_standard_filter, t.print_hide
 		FROM `tabStructure Level` s
 		INNER JOIN `tabStructure DF Creation` t
 			ON t.parent = s.name AND t.parenttype = 'Structure Level'
 		WHERE t.target_doctype IS NOT NULL AND t.target_doctype != ''
-		ORDER BY s.level
+		ORDER BY s.name
 		""",
 		as_dict=True,
 	)
@@ -333,7 +334,7 @@ def _structure_target_pairs() -> list[tuple[dict, dict]]:
 	for r in rows:
 		pairs.append(
 			(
-				frappe._dict(name=r.structure_name, structure=r.structure, level=r.level),
+				frappe._dict(name=r.structure_name),
 				frappe._dict(
 					target_doctype=r.target_doctype,
 					insert_after=r.insert_after,
@@ -363,7 +364,7 @@ def sync_all() -> None:
 	wanted_by_dt: dict[str, set[str]] = {}
 	for structure_doc, row in pairs:
 		wanted_by_dt.setdefault(row.target_doctype, set()).add(
-			custom_field_name(row.target_doctype, structure_doc.structure)
+			custom_field_name(row.target_doctype, structure_doc.name)
 		)
 
 	for target_doctype in set(target_doctypes()):
@@ -397,12 +398,12 @@ def _bulk_refill(target_doctype: str, organization_filter: list[str] | None = No
 	"""
 	pairs = frappe.db.sql(
 		"""
-		SELECT s.name AS structure_name, s.structure AS label
+		SELECT s.name AS structure_name, s.name AS label
 		FROM `tabStructure Level` s
 		INNER JOIN `tabStructure DF Creation` t
 			ON t.parent = s.name AND t.parenttype = 'Structure Level'
 		WHERE t.target_doctype = %s
-			AND s.structure IS NOT NULL AND s.structure != ''
+			AND s.name IS NOT NULL AND s.name != ''
 		""",
 		(target_doctype,),
 		as_dict=True,
@@ -460,16 +461,16 @@ def _target_structure_fields(target_doctype: str) -> set[str]:
 	"""Return the set of cascade fieldnames registered for ``target_doctype``."""
 	rows = frappe.db.sql(
 		"""
-		SELECT DISTINCT s.structure
+		SELECT DISTINCT s.name
 		FROM `tabStructure Level` s
 		INNER JOIN `tabStructure DF Creation` t
 			ON t.parent = s.name AND t.parenttype = 'Structure Level'
-		WHERE t.target_doctype = %s AND s.structure IS NOT NULL AND s.structure != ''
+		WHERE t.target_doctype = %s AND s.name IS NOT NULL AND s.name != ''
 		""",
 		(target_doctype,),
 		as_dict=True,
 	)
-	return {fieldname_for(r.structure) for r in rows}
+	return {fieldname_for(r.name) for r in rows}
 
 
 def _get_organization_ancestry(organization: str) -> list[dict]:
@@ -490,7 +491,7 @@ def _get_organization_ancestry(organization: str) -> list[dict]:
 	return frappe.db.sql(
 		"""
 		SELECT o.name, o.structure,
-		       s.structure AS structure_label
+		       s.name AS structure_label
 		FROM `tabOrganization` o
 		LEFT JOIN `tabStructure Level` s ON s.name = o.structure
 		WHERE o.lft <= %s AND o.rgt >= %s
@@ -502,23 +503,23 @@ def _get_organization_ancestry(organization: str) -> list[dict]:
 
 
 def fill(doc, target_doctype: str) -> None:
-    target_fields = _target_structure_fields(target_doctype)
+	target_fields = _target_structure_fields(target_doctype)
 
-    for fieldname in target_fields:
-        if hasattr(doc, fieldname):
-            doc.set(fieldname, None)
+	for fieldname in target_fields:
+		if hasattr(doc, fieldname):
+			doc.set(fieldname, None)
 
-    organization = doc.get("organization") if hasattr(doc, "get") else getattr(doc, "organization", None)
-    if not organization:
-        return
+	organization = doc.get("organization") if hasattr(doc, "get") else getattr(doc, "organization", None)
+	if not organization:
+		return
 
-    for node in _get_organization_ancestry(organization):
-        structure_label = node.get("structure_label")
-        if not structure_label:
-            continue
-        fieldname = fieldname_for(structure_label)
-        if fieldname in target_fields and hasattr(doc, fieldname):
-            doc.set(fieldname, node["name"])
+	for node in _get_organization_ancestry(organization):
+		structure_label = node.get("structure_label")
+		if not structure_label:
+			continue
+		fieldname = fieldname_for(structure_label)
+		if fieldname in target_fields and hasattr(doc, fieldname):
+			doc.set(fieldname, node["name"])
 
 
 def fill_on_save(doc, method=None):
@@ -539,7 +540,7 @@ def propagate_position_change(doc, method=None):
 	``position`` points to this Position must have its ``organization``
 	(and all cascade fields) updated to match. Employee.organization
 	is declared as ``fetch_from: position.organization`` but Frappe's
-	fetch_from only fires on the client — this hook handles the backend
+	fetch_from only fires on the client -- this hook handles the backend
 	propagation for existing records.
 	"""
 	if not doc.has_value_changed("organization"):
@@ -629,10 +630,8 @@ def _backfill_legacy_position_targets() -> None:
 	child table for any Structure Level that already has a ``'Position {Label}'``
 	CF in the database. Idempotent: re-runs are no-ops.
 	"""
-	for s in frappe.get_all("Structure Level", fields=["name", "structure"]):
-		if not s.structure:
-			continue
-		cf_name = custom_field_name("Position", s.structure)
+	for s in frappe.get_all("Structure Level", fields=["name"]):
+		cf_name = custom_field_name("Position", s.name)
 		if not frappe.db.exists("Custom Field", cf_name):
 			continue
 		existing = frappe.get_all(
