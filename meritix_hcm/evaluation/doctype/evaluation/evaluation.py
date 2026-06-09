@@ -96,12 +96,12 @@ class Evaluation(Document):
 def get_evaluation_factors(doctype, txt, searchfield, start, page_len, filters):
     evaluation_form = filters.get('evaluation_form')
     return frappe.db.sql("""
-        SELECT ef.name, ef.factor
+        SELECT ef.name AS factor_label
         FROM `tabEvaluation Factor` ef
         INNER JOIN `tabEvaluation Factor Setup` efc ON efc.factor = ef.name
         WHERE efc.parent = %(evaluation_form)s
         AND efc.parentfield = 'evaluation_factor_setup'
-        AND (ef.name LIKE %(txt)s OR ef.factor LIKE %(txt)s)
+        AND (ef.name LIKE %(txt)s OR ef.name LIKE %(txt)s)
         LIMIT %(page_len)s OFFSET %(start)s
     """, {
         'evaluation_form': evaluation_form,

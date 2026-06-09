@@ -19,7 +19,7 @@ def get_factors(filters):
         values['evaluation_form'] = filters['evaluation_form']
 
     return frappe.db.sql(f"""
-        SELECT DISTINCT paf.name, paf.factor
+        SELECT DISTINCT paf.name, paf.name
         FROM `tabEvaluation Factor` paf
         INNER JOIN `tabEvaluation Factor Setup` pfc ON pfc.factor = paf.name
         {conditions}
@@ -34,7 +34,7 @@ def get_columns(factors):
         {"fieldname": "job",                "label": _("Job"),           "fieldtype": "Data",                        "width": 150},
     ]
     for f in factors:
-        columns.append({"fieldname": f.name, "label": f.factor, "fieldtype": "Float", "width": 150})
+        columns.append({"fieldname": f.name, "label": f.name, "fieldtype": "Float", "width": 150})
     columns.append({"fieldname": "final_score", "label": _("Final Score"), "fieldtype": "Float", "width": 150})
     return columns
 

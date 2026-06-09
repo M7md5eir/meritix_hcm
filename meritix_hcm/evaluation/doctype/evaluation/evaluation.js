@@ -2,7 +2,6 @@ frappe.ui.form.on('Evaluation', {
 
     refresh(frm) {
         set_evaluation_form_query(frm);
-        set_evaluation_period_query(frm);
         set_evaluation_subject_query(frm);
         set_evaluation_factor_query(frm);
     },
@@ -112,16 +111,6 @@ function calculate_percent(frm, cdt, cdn) {
 
 function set_evaluation_form_query(frm) {
     frm.set_query('evaluation_form', function() {
-        return {
-            filters: {
-                docstatus: 1
-            }
-        };
-    });
-}
-
-function set_evaluation_period_query(frm) {
-    frm.set_query('evaluation_period', function() {
         return {
             filters: {
                 docstatus: 1
