@@ -25,7 +25,7 @@ frappe.query_reports["Evaluation Result"] = {
         const skip = ["evaluation_subject", "emp_name", "job", "final_score"];
         if (data && !skip.includes(column.fieldname)) {
             if (!data[column.fieldname + "_submitted"]) {
-                value = `<span style="color: red">${value}</span>`;
+                value = `<div style="background-color: #fff0f0; color: #941f1f; margin: -4px -8px; padding: 4px 8px;">${value}</div>`;
             }
         }
 

@@ -42,15 +42,15 @@ frappe.ui.form.on('Evaluation', {
     evaluation_subject(frm) {
         frm.set_value('organization', null);
         if (!frm.doc.evaluation_subject || !frm.doc.evaluation_factor_doctype) return;
-
-        frappe.db.get_value(frm.doc.evaluation_factor_doctype, frm.doc.evaluation_subject, ['name', 'organization'], (r) => {
-            if (!r) return;
-            if (frm.doc.evaluation_factor_doctype === 'Organization') {
-                frm.set_value('organization', r.name);
-            } else {
+    
+        if (frm.doc.evaluation_factor_doctype === 'Organization') {
+            frm.set_value('organization', frm.doc.evaluation_subject);
+        } else {
+            frappe.db.get_value(frm.doc.evaluation_factor_doctype, frm.doc.evaluation_subject, 'organization', (r) => {
+                if (!r) return;
                 frm.set_value('organization', r.organization);
-            }
-        });
+            });
+        }
     }
 
 });
