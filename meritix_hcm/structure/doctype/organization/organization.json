@@ -2,7 +2,7 @@
  "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
- "autoname": "ORG-.######",
+ "autoname": "prompt",
  "creation": "2024-11-10 23:41:00.635906",
  "default_view": "List",
  "doctype": "DocType",
@@ -10,7 +10,6 @@
  "field_order": [
   "tab1_sec1",
   "tab1_sec1_col1",
-  "organization",
   "parent_organization",
   "structure",
   "level",
@@ -27,12 +26,6 @@
   "tab1_sec2_col2"
  ],
  "fields": [
-  {
-   "fieldname": "organization",
-   "fieldtype": "Data",
-   "label": "Organization",
-   "translatable": 1
-  },
   {
    "fieldname": "parent_organization",
    "fieldtype": "Structure Link",
@@ -144,11 +137,11 @@
  "index_web_pages_for_search": 1,
  "is_tree": 1,
  "links": [],
- "modified": "2026-06-02 19:56:23.160272",
+ "modified": "2026-06-10 10:55:37.595502",
  "modified_by": "Administrator",
  "module": "Structure",
  "name": "Organization",
- "naming_rule": "Autoincrement",
+ "naming_rule": "Set by user",
  "nsm_parent_field": "parent_organization",
  "owner": "Administrator",
  "permissions": [
@@ -166,7 +159,6 @@
   }
  ],
  "row_format": "Dynamic",
- "show_title_field_in_link": 1,
  "sort_field": "level",
  "sort_order": "ASC",
  "states": [
@@ -175,7 +167,6 @@
    "title": "1"
   }
  ],
- "title_field": "organization",
  "track_changes": 1,
  "translated_doctype": 1
 }
