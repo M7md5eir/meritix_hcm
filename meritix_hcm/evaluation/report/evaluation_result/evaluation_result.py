@@ -48,13 +48,6 @@ def get_data(filters, factors):
     if not filters.get('evaluation_period'):
         return []
 
-    emp_factors = [f for f in factors if f.doctype_list == 'Employee']
-    org_factors = [f for f in factors if f.doctype_list == 'Organization']
-
-    factor_structure = {}
-    for f in org_factors:
-        factor_structure[f.name] = scrub(f.structure_level) if f.structure_level else None
-
     conditions = "WHERE e.evaluation_factor_doctype = 'Employee'"
     values = {}
 
@@ -67,82 +60,72 @@ def get_data(filters, factors):
     conditions += sc_cond
     values.update(sc_values)
 
-    emp_factor_selects = "".join(f"""
+    # بناء الـ factor selects
+    factor_selects_parts = []
+    for f in factors:
+        # emp score
+        factor_selects_parts.append(f"""
         , SUM(CASE WHEN e.evaluation_factor = '{f.name}' AND e.docstatus = 1 THEN e.final_score ELSE 0 END) AS `{f.name}_emp`
-    """ for f in emp_factors)
+        , SUM(CASE WHEN e.evaluation_factor = '{f.name}' AND e.docstatus = 1 THEN 1 ELSE 0 END) AS `{f.name}_emp_count`
+        """)
+
+        # org score - بيتربط بالـ structure field في الموظف
+        if f.doctype_list == 'Organization' and f.structure_level:
+            field_name = scrub(f.structure_level)
+            factor_selects_parts.append(f"""
+        , COALESCE((
+            SELECT o.final_score FROM `tabEvaluation` o
+            WHERE o.evaluation_form = e.evaluation_form
+            AND o.evaluation_period = e.evaluation_period
+            AND o.evaluation_factor_doctype = 'Organization'
+            AND o.evaluation_factor = '{f.name}'
+            AND o.evaluation_subject = e.`{field_name}`
+            AND o.docstatus = 1
+            LIMIT 1
+        ), 0) AS `{f.name}_org`
+        , COALESCE((
+            SELECT COUNT(*) FROM `tabEvaluation` o
+            WHERE o.evaluation_form = e.evaluation_form
+            AND o.evaluation_period = e.evaluation_period
+            AND o.evaluation_factor_doctype = 'Organization'
+            AND o.evaluation_factor = '{f.name}'
+            AND o.evaluation_subject = e.`{field_name}`
+            AND o.docstatus = 1
+        ), 0) AS `{f.name}_org_count`
+            """)
+        else:
+            factor_selects_parts.append(f"""
+        , 0 AS `{f.name}_org`
+        , 0 AS `{f.name}_org_count`
+            """)
+
+    factor_selects = "".join(factor_selects_parts)
 
     rows = frappe.db.sql(f"""
         SELECT e.evaluation_subject
-        {emp_factor_selects}
+        {factor_selects}
         FROM `tabEvaluation` e
         LEFT JOIN `tabEvaluation Form` ef ON ef.name = e.evaluation_form
         {conditions}
         GROUP BY e.evaluation_subject
     """, values, as_dict=True)
 
-    if not rows:
-        return []
-
-    emp_names = [r.evaluation_subject for r in rows]
-    emp_data = {}
-    if emp_names:
-        placeholders = ", ".join(["%s"] * len(emp_names))
-        emp_records = frappe.db.sql(f"""
-            SELECT name, emp_name, job, bu, sub_bu, sector, department, company, organization
-            FROM `tabEmployee`
-            WHERE name IN ({placeholders})
-        """, emp_names, as_dict=True)
-        emp_data = {e.name: e for e in emp_records}
-
-    org_evaluations = {}
-    if org_factors:
-        org_factor_names = [f.name for f in org_factors]
-        org_placeholders = ", ".join(["%s"] * len(org_factor_names))
-        org_period = filters.get('evaluation_period')
-        org_form = filters.get('evaluation_form')
-
-        org_records = frappe.db.sql(f"""
-            SELECT evaluation_factor, evaluation_subject, final_score
-            FROM `tabEvaluation`
-            WHERE evaluation_form = %s
-            AND evaluation_period = %s
-            AND evaluation_factor_doctype = 'Organization'
-            AND evaluation_factor IN ({org_placeholders})
-            AND docstatus = 1
-        """, [org_form, org_period] + org_factor_names, as_dict=True)
-
-        for rec in org_records:
-            org_evaluations.setdefault(rec.evaluation_factor, {})[rec.evaluation_subject] = rec.final_score
-
     result = []
     for row in rows:
-        emp = emp_data.get(row.evaluation_subject, {})
+        final_score = 0
+        emp = frappe.db.get_value('Employee', row.evaluation_subject, ['emp_name', 'job'], as_dict=True) or {}
         new_row = {
             "evaluation_subject": row.evaluation_subject,
             "emp_name": emp.get('emp_name'),
             "job": emp.get('job'),
         }
-
-        final_score = 0
-
-        for f in emp_factors:
-            score = row.get(f'{f.name}_emp') or 0
+        for f in factors:
+            emp_count = row.get(f'{f.name}_emp_count') or 0
+            org_count = row.get(f'{f.name}_org_count') or 0
+            score = (row.get(f'{f.name}_emp') or 0) + (row.get(f'{f.name}_org') or 0)
             new_row[f.name] = score
+            new_row[f'{f.name}_submitted'] = (emp_count + org_count) > 0
             final_score += score
-
-        for f in org_factors:
-            field_name = factor_structure.get(f.name)
-            if field_name:
-                emp_org_value = emp.get(field_name)
-                if emp_org_value:
-                    score = org_evaluations.get(f.name, {}).get(emp_org_value, 0)
-                else:
-                    score = 0
-            else:
-                score = 0
-            new_row[f.name] = score
-            final_score += score
-
         new_row['final_score'] = final_score
         result.append(new_row)
 
