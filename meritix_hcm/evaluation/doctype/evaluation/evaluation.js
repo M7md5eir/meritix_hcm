@@ -25,35 +25,55 @@ frappe.ui.form.on('Evaluation', {
     evaluation_form(frm) {
         frm.set_value('evaluation_factor', null);
         frm.set_value('evaluation_subject', null);
-        frm.set_value('organization', null);
+        clear_subject_fields(frm);
         set_evaluation_factor_query(frm);
     },
 
     evaluation_factor(frm) {
         frm.set_value('evaluation_subject', null);
-        frm.set_value('organization', null);
+        clear_subject_fields(frm);
         set_evaluation_subject_query(frm);
     },
 
     evaluation_factor_doctype(frm) {
         frm.set_value('evaluation_subject', null);
+        clear_subject_fields(frm);
     },
 
     evaluation_subject(frm) {
-        frm.set_value('organization', null);
-        if (!frm.doc.evaluation_subject || !frm.doc.evaluation_factor_doctype) return;
-    
-        if (frm.doc.evaluation_factor_doctype === 'Organization') {
-            frm.set_value('organization', frm.doc.evaluation_subject);
-        } else {
-            frappe.db.get_value(frm.doc.evaluation_factor_doctype, frm.doc.evaluation_subject, 'organization', (r) => {
-                if (!r) return;
-                frm.set_value('organization', r.organization);
-            });
-        }
+        set_fields_from_subject(frm);
     }
 
 });
+
+// الحقول اللي بتتسحب من الـ evaluation_subject
+const SUBJECT_FIELDS = ['organization', 'job', 'emp_name', 'position', 'emp_img'];
+
+function clear_subject_fields(frm) {
+    SUBJECT_FIELDS.forEach(function(f) {
+        frm.set_value(f, null);
+    });
+}
+
+function set_fields_from_subject(frm) {
+    clear_subject_fields(frm);
+
+    if (!frm.doc.evaluation_subject || !frm.doc.evaluation_factor_doctype) return;
+
+    frappe.call({
+        method: 'meritix_hcm.evaluation.doctype.evaluation.evaluation.get_subject_fields',
+        args: {
+            evaluation_factor_doctype: frm.doc.evaluation_factor_doctype,
+            evaluation_subject: frm.doc.evaluation_subject
+        },
+        callback: function(r) {
+            if (!r.message) return;
+            SUBJECT_FIELDS.forEach(function(f) {
+                frm.set_value(f, r.message[f] || null);
+            });
+        }
+    });
+}
 
 // منقول: حساب النسبة المئوية عند تغيير achieved أو planned أو reverse_calc
 frappe.ui.form.on('Evaluation Record', {

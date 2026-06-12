@@ -8,7 +8,7 @@ from meritix_hcm.structure import cascade_custom_fields
 
 class Evaluation(Document):
     def before_save(self):
-        self.set_organization_from_evaluation_subject()
+        self.set_fields_from_evaluation_subject()
         cascade_custom_fields.fill(self, self.doctype)
 
         # منقول: حذف الصفوف الفاضية من الـ child table
@@ -72,23 +72,50 @@ class Evaluation(Document):
         cascade_custom_fields.fill(self, self.doctype)
         self.db_update()
 
-    def set_organization_from_evaluation_subject(self):
-        if not self.evaluation_subject or not self.evaluation_factor_doctype:
-            return
+    def set_fields_from_evaluation_subject(self):
+        # بتستخدم نفس الدالة الـ whitelisted (single source of truth)
+        data = get_subject_fields(self.evaluation_factor_doctype, self.evaluation_subject)
+        for f, v in data.items():
+            self.set(f, v)
 
-        result = frappe.db.get_value(
-            self.evaluation_factor_doctype,
-            self.evaluation_subject,
-            ['name', 'organization'],
-            as_dict=True
-        )
-        if not result:
-            return
 
-        if self.evaluation_factor_doctype == 'Organization':
-            self.organization = result.get('name')
+@frappe.whitelist()
+def get_subject_fields(evaluation_factor_doctype, evaluation_subject):
+    """بترجّع الحقول اللي بتتسحب من الـ evaluation_subject
+    بتستخدمها الـ controller (server) والـ client (JS) بنفس اللوجيك.
+    أي حقل مش موجود في الـ doctype المستهدف يرجع None."""
+    target_fields = ['organization', 'job', 'emp_name', 'position', 'image']
+
+    # الحقول اللي لو الsubject نفسه هو الـ doctype بتاعها تاخد الـ name (Link fields)
+    field_to_doctype = {
+        'organization': 'Organization',
+        'job': 'Job',
+        'position': 'Position',
+    }
+
+    data = {f: None for f in target_fields}
+
+    if not evaluation_subject or not evaluation_factor_doctype:
+        return data
+
+    meta = frappe.get_meta(evaluation_factor_doctype)
+
+    # نبني list الحقول حسب اللي موجود فعلاً في الـ doctype المستهدف
+    fetch_fields = ['name'] + [f for f in target_fields if meta.has_field(f)]
+
+    result = frappe.db.get_value(
+        evaluation_factor_doctype, evaluation_subject, fetch_fields, as_dict=True
+    )
+    if not result:
+        return data
+
+    for f in target_fields:
+        if evaluation_factor_doctype == field_to_doctype.get(f):
+            data[f] = result.get('name')
         else:
-            self.organization = result.get('organization')
+            data[f] = result.get(f)  # None لو الحقل مش موجود
+
+    return data
 
 
 @frappe.whitelist()

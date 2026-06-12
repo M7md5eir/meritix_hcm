@@ -32,7 +32,7 @@ def get_columns(factors):
     columns = [
         {"fieldname": "evaluation_subject", "label": _("Emp ID"),        "fieldtype": "Link", "options": "Employee", "width": 100},
         {"fieldname": "emp_name",           "label": _("Employee Name"), "fieldtype": "Data",                        "width": 300},
-        {"fieldname": "job",                "label": _("Job"),           "fieldtype": "Data",                        "width": 150},
+        {"fieldname": "job",                "label": _("Job"),           "fieldtype": "Data",                        "width": 200},
     ]
     for f in factors:
         columns.append({"fieldname": f.name, "label": f.name, "fieldtype": "Float", "width": 150})
@@ -103,6 +103,8 @@ def get_data(filters, factors):
 
     rows = frappe.db.sql(f"""
         SELECT e.evaluation_subject
+        , MAX(e.emp_name) AS emp_name
+        , MAX(e.job) AS job
         {factor_selects}
         FROM `tabEvaluation` e
         LEFT JOIN `tabEvaluation Form` ef ON ef.name = e.evaluation_form
@@ -113,11 +115,10 @@ def get_data(filters, factors):
     result = []
     for row in rows:
         final_score = 0
-        emp = frappe.db.get_value('Employee', row.evaluation_subject, ['emp_name', 'job'], as_dict=True) or {}
         new_row = {
             "evaluation_subject": row.evaluation_subject,
-            "emp_name": emp.get('emp_name'),
-            "job": emp.get('job'),
+            "emp_name": row.get('emp_name'),
+            "job": row.get('job'),
         }
         for f in factors:
             emp_count = row.get(f'{f.name}_emp_count') or 0

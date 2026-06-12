@@ -20,6 +20,10 @@
   "tab1_sec2",
   "tab1_sec2_col1",
   "evaluation_subject",
+  "emp_name",
+  "position",
+  "job",
+  "image",
   "tab1_sec2_col2",
   "organization",
   "tab1_sec2_col3",
@@ -190,13 +194,43 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "job",
+   "fieldtype": "Link",
+   "label": "Job",
+   "options": "Job",
+   "read_only": 1
+  },
+  {
+   "fieldname": "position",
+   "fieldtype": "Link",
+   "label": "Position",
+   "options": "Position",
+   "read_only": 1
+  },
+  {
+   "fieldname": "emp_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "label": "Emp name",
+   "options": "Position",
+   "read_only": 1
+  },
+  {
+   "fieldname": "image",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "Image"
   }
  ],
  "grid_page_length": 50,
+ "image_field": "image",
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-06-11 20:40:04.213941",
+ "modified": "2026-06-13 02:14:09.412210",
  "modified_by": "Administrator",
  "module": "Evaluation",
  "name": "Evaluation",

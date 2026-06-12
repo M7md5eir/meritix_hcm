@@ -12,7 +12,7 @@
   "emp_id",
   "emp_name",
   "join_date",
-  "emp_img",
+  "image",
   "tab1_sec1_col2",
   "tab1_sec1_col3",
   "tab1_sec2",
@@ -42,12 +42,6 @@
    "fieldname": "join_date",
    "fieldtype": "Date",
    "label": "Join Date"
-  },
-  {
-   "fieldname": "emp_img",
-   "fieldtype": "Attach Image",
-   "hidden": 1,
-   "label": "Emp IMG"
   },
   {
    "fieldname": "position",
@@ -109,13 +103,19 @@
   {
    "fieldname": "tab1_sec2_col3",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "image",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "Image"
   }
  ],
  "grid_page_length": 50,
- "image_field": "emp_img",
+ "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-05-08 16:20:25.996038",
+ "modified": "2026-06-13 02:03:39.827695",
  "modified_by": "Administrator",
  "module": "Structure",
  "name": "Employee",
