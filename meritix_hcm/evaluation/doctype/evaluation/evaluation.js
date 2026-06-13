@@ -47,7 +47,7 @@ frappe.ui.form.on('Evaluation', {
 });
 
 // الحقول اللي بتتسحب من الـ evaluation_subject
-const SUBJECT_FIELDS = ['organization', 'job', 'emp_name', 'position', 'emp_img'];
+const SUBJECT_FIELDS = ['organization', 'job', 'emp_name', 'position', 'image'];
 
 function clear_subject_fields(frm) {
     SUBJECT_FIELDS.forEach(function(f) {
