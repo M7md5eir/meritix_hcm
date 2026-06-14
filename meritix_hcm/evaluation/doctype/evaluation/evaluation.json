@@ -215,14 +215,15 @@
    "in_list_view": 1,
    "in_preview": 1,
    "label": "Emp name",
-   "options": "Position",
    "read_only": 1
   },
   {
    "fieldname": "image",
    "fieldtype": "Attach Image",
    "hidden": 1,
-   "label": "Image"
+   "is_virtual": 1,
+   "label": "Image",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
@@ -230,7 +231,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-06-13 02:14:09.412210",
+ "modified": "2026-06-14 23:36:56.554792",
  "modified_by": "Administrator",
  "module": "Evaluation",
  "name": "Evaluation",

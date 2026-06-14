@@ -108,14 +108,15 @@
    "fieldname": "image",
    "fieldtype": "Attach Image",
    "hidden": 1,
-   "label": "Image"
+   "label": "Image",
+   "make_attachment_public": 1
   }
  ],
  "grid_page_length": 50,
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-13 02:03:39.827695",
+ "modified": "2026-06-14 23:37:23.730652",
  "modified_by": "Administrator",
  "module": "Structure",
  "name": "Employee",

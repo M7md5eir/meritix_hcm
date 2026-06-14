@@ -79,7 +79,7 @@
   {
    "child": 1,
    "collapsible": 1,
-   "icon": "circle-dot",
+   "icon": "",
    "indent": 0,
    "keep_closed": 0,
    "label": "Evaluation Result",
@@ -89,7 +89,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-06-01 16:29:05.784781",
+ "modified": "2026-06-14 23:16:29.841513",
  "modified_by": "Administrator",
  "module": "Evaluation",
  "name": "Evaluation Module",
