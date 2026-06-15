@@ -40,6 +40,26 @@ def get_columns(factors):
     return columns
 
 
+def get_permitted_subjects(filters):
+    conditions = {
+        "evaluation_factor_doctype": "Employee"
+    }
+    if filters.get('evaluation_form'):
+        conditions['evaluation_form'] = filters['evaluation_form']
+    if filters.get('evaluation_period'):
+        conditions['evaluation_period'] = filters['evaluation_period']
+
+    records = frappe.get_list(
+        "Evaluation",
+        filters=conditions,
+        fields=["evaluation_subject"],
+        ignore_permissions=False,
+        limit=0
+    )
+
+    return list(set([r.evaluation_subject for r in records]))
+
+
 def get_data(filters, factors):
     if not factors:
         return []
@@ -56,20 +76,30 @@ def get_data(filters, factors):
             conditions += f" AND e.{key} = %({key})s"
             values[key] = filters[key]
 
+    # تطبيق صلاحيات عن طريق Frappe permissions
+    permitted_subjects = get_permitted_subjects(filters)
+    if permitted_subjects:
+        subject_placeholders = []
+        for i, subj in enumerate(permitted_subjects):
+            key = f"subj_{i}"
+            values[key] = subj
+            subject_placeholders.append(f"%(subj_{i})s")
+        conditions += f" AND e.evaluation_subject IN ({', '.join(subject_placeholders)})"
+    else:
+        # مفيش subjects مسموح بيها خالص
+        return []
+
     sc_cond, sc_values = apply_structure_filter(filters, fieldname="organization", alias="e", tree_doctype="Organization")
     conditions += sc_cond
     values.update(sc_values)
 
-    # بناء الـ factor selects
     factor_selects_parts = []
     for f in factors:
-        # emp score
         factor_selects_parts.append(f"""
         , SUM(CASE WHEN e.evaluation_factor = '{f.name}' AND e.docstatus = 1 THEN e.final_score ELSE 0 END) AS `{f.name}_emp`
         , SUM(CASE WHEN e.evaluation_factor = '{f.name}' AND e.docstatus = 1 THEN 1 ELSE 0 END) AS `{f.name}_emp_count`
         """)
 
-        # org score - بيتربط بالـ structure field في الموظف
         if f.doctype_list == 'Organization' and f.structure_level:
             field_name = scrub(f.structure_level)
             factor_selects_parts.append(f"""
