@@ -30,9 +30,9 @@ def get_factors(filters):
 
 def get_columns(factors):
     columns = [
-        {"fieldname": "evaluation_subject", "label": _("Emp ID"),        "fieldtype": "Link", "options": "Employee", "width": 100},
-        {"fieldname": "emp_name",           "label": _("Employee Name"), "fieldtype": "Data",                        "width": 300},
-        {"fieldname": "job",                "label": _("Job"),           "fieldtype": "Data",                        "width": 200},
+        {"fieldname": "evaluation_subject", "label": _("Emp ID"),        "fieldtype": "Link", "options": "Employee", "width": 100, "align": "left"},
+        {"fieldname": "emp_name",           "label": _("Employee Name"), "fieldtype": "Data",                        "width": 300, "align": "left"},
+        {"fieldname": "job",                "label": _("Job"),           "fieldtype": "Data",                        "width": 200, "align": "left"},
     ]
     for f in factors:
         columns.append({"fieldname": f.name, "label": f.name, "fieldtype": "Float", "width": 150})
