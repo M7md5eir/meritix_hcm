@@ -32,11 +32,11 @@ def get_columns(factors):
     columns = [
         {"fieldname": "evaluation_subject", "label": _("Emp ID"),        "fieldtype": "Link", "options": "Employee", "width": 100, "align": "left"},
         {"fieldname": "emp_name",           "label": _("Employee Name"), "fieldtype": "Data",                        "width": 300, "align": "left"},
-        {"fieldname": "job",                "label": _("Job"),           "fieldtype": "Data",                        "width": 200, "align": "left"},
+        {"fieldname": "job",                "label": _("Job"),           "fieldtype": "Data",                        "width": 300, "align": "left"},
     ]
     for f in factors:
-        columns.append({"fieldname": f.name, "label": f.name, "fieldtype": "Float", "width": 150})
-    columns.append({"fieldname": "final_score", "label": _("Final Score"), "fieldtype": "Float", "width": 150})
+        columns.append({"fieldname": f.name, "label": f.name, "fieldtype": "Float", "width": 150, "align": "left"})
+    columns.append({"fieldname": "final_score", "label": _("Final Score"), "fieldtype": "Float", "width": 175, "align": "left"})
     return columns
 
 
