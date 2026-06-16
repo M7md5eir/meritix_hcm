@@ -65,6 +65,7 @@
    "fieldname": "evaluation_period",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_preview": 1,
    "in_standard_filter": 1,
    "label": "Evaluation Period",
    "options": "Period"
@@ -205,14 +206,13 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "in_preview": 1,
-   "label": "Emp name",
+   "label": "Emp Name",
    "read_only": 1
   },
   {
    "fieldname": "image",
    "fieldtype": "Attach Image",
    "hidden": 1,
-   "is_virtual": 1,
    "label": "Image",
    "read_only": 1
   }
@@ -222,7 +222,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-06-16 12:46:43.761603",
+ "modified": "2026-06-16 13:54:16.350899",
  "modified_by": "Administrator",
  "module": "Evaluation",
  "name": "Evaluation",
