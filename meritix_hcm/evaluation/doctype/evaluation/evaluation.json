@@ -37,7 +37,6 @@
   "tab1_sec4_col3",
   "tab1_sec4_col4",
   "score",
-  "final_score",
   "tab1_sec9",
   "amended_from"
  ],
@@ -171,14 +170,6 @@
    "fieldname": "score",
    "fieldtype": "Percent",
    "label": "Score",
-   "precision": "2",
-   "read_only": 1
-  },
-  {
-   "fieldname": "final_score",
-   "fieldtype": "Percent",
-   "label": "Final Score",
-   "precision": "2",
    "read_only": 1
   },
   {
@@ -231,7 +222,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-06-14 23:36:56.554792",
+ "modified": "2026-06-16 12:46:43.761603",
  "modified_by": "Administrator",
  "module": "Evaluation",
  "name": "Evaluation",

@@ -20,7 +20,8 @@ def get_factors(filters):
         values['evaluation_form'] = filters['evaluation_form']
 
     return frappe.db.sql(f"""
-        SELECT DISTINCT paf.name, paf.name, paf.structure_level, paf.doctype_list
+        SELECT DISTINCT paf.name, paf.structure_level, paf.doctype_list,
+               pfc.weight AS factor_weight
         FROM `tabEvaluation Factor` paf
         INNER JOIN `tabEvaluation Factor Setup` pfc ON pfc.factor = paf.name
         {conditions}
@@ -30,19 +31,21 @@ def get_factors(filters):
 
 def get_columns(factors):
     columns = [
-        {"fieldname": "evaluation_subject", "label": _("Emp ID"),        "fieldtype": "Link", "options": "Employee", "width": 100, "align": "left"},
-        {"fieldname": "emp_name",           "label": _("Employee Name"), "fieldtype": "Data",                        "width": 300, "align": "left"},
-        {"fieldname": "job",                "label": _("Job"),           "fieldtype": "Data",                        "width": 300, "align": "left"},
+        {"fieldname": "evaluation_name",    "label": _("Evaluation"),    "fieldtype": "Link", "options": "Evaluation", "width": 120, "align": "left"},
+        {"fieldname": "evaluation_subject", "label": _("Emp ID"),        "fieldtype": "Link", "options": "Employee",   "width": 100, "align": "left"},
+        {"fieldname": "emp_name",           "label": _("Employee Name"), "fieldtype": "Data",                          "width": 300, "align": "left"},
+        {"fieldname": "job",                "label": _("Job"),           "fieldtype": "Data",                          "width": 300, "align": "left"},
     ]
     for f in factors:
-        columns.append({"fieldname": f.name, "label": f.name, "fieldtype": "Float", "width": 150, "align": "left"})
-    columns.append({"fieldname": "final_score", "label": _("Final Score"), "fieldtype": "Float", "width": 175, "align": "left"})
+        columns.append({"fieldname": f.name, "label": f.name, "fieldtype": "Percent", "width": 150, "align": "left"})
+    columns.append({"fieldname": "final_score", "label": _("Final Score"), "fieldtype": "Percent", "width": 175, "align": "left"})
     return columns
 
 
 def get_permitted_subjects(filters):
     conditions = {
-        "evaluation_factor_doctype": "Employee"
+        "evaluation_factor_doctype": "Employee",
+        "docstatus": ["in", [0, 1]]
     }
     if filters.get('evaluation_form'):
         conditions['evaluation_form'] = filters['evaluation_form']
@@ -68,7 +71,7 @@ def get_data(filters, factors):
     if not filters.get('evaluation_period'):
         return []
 
-    conditions = "WHERE e.evaluation_factor_doctype = 'Employee'"
+    conditions = "WHERE e.evaluation_factor_doctype = 'Employee' AND e.docstatus IN (0, 1)"
     values = {}
 
     for key in ('evaluation_form', 'evaluation_period'):
@@ -76,7 +79,6 @@ def get_data(filters, factors):
             conditions += f" AND e.{key} = %({key})s"
             values[key] = filters[key]
 
-    # تطبيق صلاحيات عن طريق Frappe permissions
     permitted_subjects = get_permitted_subjects(filters)
     if permitted_subjects:
         subject_placeholders = []
@@ -86,31 +88,34 @@ def get_data(filters, factors):
             subject_placeholders.append(f"%(subj_{i})s")
         conditions += f" AND e.evaluation_subject IN ({', '.join(subject_placeholders)})"
     else:
-        # مفيش subjects مسموح بيها خالص
         return []
 
     sc_cond, sc_values = apply_structure_filter(filters, fieldname="organization", alias="e", tree_doctype="Organization")
     conditions += sc_cond
     values.update(sc_values)
 
+    # بناء map للـ factor weights
+    factor_weights = {f.name: f.factor_weight or 0 for f in factors}
+
     factor_selects_parts = []
     for f in factors:
         factor_selects_parts.append(f"""
-        , SUM(CASE WHEN e.evaluation_factor = '{f.name}' AND e.docstatus = 1 THEN e.final_score ELSE 0 END) AS `{f.name}_emp`
-        , SUM(CASE WHEN e.evaluation_factor = '{f.name}' AND e.docstatus = 1 THEN 1 ELSE 0 END) AS `{f.name}_emp_count`
+        , SUM(CASE WHEN e.evaluation_factor = '{f.name}' AND e.docstatus IN (0, 1) THEN e.score ELSE 0 END) AS `{f.name}_emp`
+        , SUM(CASE WHEN e.evaluation_factor = '{f.name}' AND e.docstatus IN (0, 1) THEN 1 ELSE 0 END) AS `{f.name}_emp_count`
+        , SUM(CASE WHEN e.evaluation_factor = '{f.name}' AND e.docstatus = 1 THEN 1 ELSE 0 END) AS `{f.name}_emp_submitted_count`
         """)
 
         if f.doctype_list == 'Organization' and f.structure_level:
             field_name = scrub(f.structure_level)
             factor_selects_parts.append(f"""
         , COALESCE((
-            SELECT o.final_score FROM `tabEvaluation` o
+            SELECT o.score FROM `tabEvaluation` o
             WHERE o.evaluation_form = e.evaluation_form
             AND o.evaluation_period = e.evaluation_period
             AND o.evaluation_factor_doctype = 'Organization'
             AND o.evaluation_factor = '{f.name}'
             AND o.evaluation_subject = e.`{field_name}`
-            AND o.docstatus = 1
+            AND o.docstatus IN (0, 1)
             LIMIT 1
         ), 0) AS `{f.name}_org`
         , COALESCE((
@@ -120,19 +125,30 @@ def get_data(filters, factors):
             AND o.evaluation_factor_doctype = 'Organization'
             AND o.evaluation_factor = '{f.name}'
             AND o.evaluation_subject = e.`{field_name}`
-            AND o.docstatus = 1
+            AND o.docstatus IN (0, 1)
         ), 0) AS `{f.name}_org_count`
+        , COALESCE((
+            SELECT COUNT(*) FROM `tabEvaluation` o
+            WHERE o.evaluation_form = e.evaluation_form
+            AND o.evaluation_period = e.evaluation_period
+            AND o.evaluation_factor_doctype = 'Organization'
+            AND o.evaluation_factor = '{f.name}'
+            AND o.evaluation_subject = e.`{field_name}`
+            AND o.docstatus = 1
+        ), 0) AS `{f.name}_org_submitted_count`
             """)
         else:
             factor_selects_parts.append(f"""
         , 0 AS `{f.name}_org`
         , 0 AS `{f.name}_org_count`
+        , 0 AS `{f.name}_org_submitted_count`
             """)
 
     factor_selects = "".join(factor_selects_parts)
 
     rows = frappe.db.sql(f"""
         SELECT e.evaluation_subject
+        , MAX(e.name) AS evaluation_name
         , MAX(e.emp_name) AS emp_name
         , MAX(e.job) AS job
         {factor_selects}
@@ -147,16 +163,20 @@ def get_data(filters, factors):
         final_score = 0
         new_row = {
             "evaluation_subject": row.evaluation_subject,
+            "evaluation_name": row.get('evaluation_name'),
+            "evaluation_name_submitted": True,
             "emp_name": row.get('emp_name'),
             "job": row.get('job'),
         }
         for f in factors:
-            emp_count = row.get(f'{f.name}_emp_count') or 0
-            org_count = row.get(f'{f.name}_org_count') or 0
+            emp_submitted_count = row.get(f'{f.name}_emp_submitted_count') or 0
+            org_submitted_count = row.get(f'{f.name}_org_submitted_count') or 0
             score = (row.get(f'{f.name}_emp') or 0) + (row.get(f'{f.name}_org') or 0)
-            new_row[f.name] = score
-            new_row[f'{f.name}_submitted'] = (emp_count + org_count) > 0
-            final_score += score
+            weight = factor_weights.get(f.name, 0)
+            factor_final = (score * weight) / 100
+            new_row[f.name] = factor_final
+            new_row[f'{f.name}_submitted'] = (emp_submitted_count + org_submitted_count) > 0
+            final_score += factor_final
         new_row['final_score'] = final_score
         result.append(new_row)
 
