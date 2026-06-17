@@ -21,11 +21,11 @@ def get_factors(filters):
 
     return frappe.db.sql(f"""
         SELECT DISTINCT paf.name, paf.structure_level, paf.doctype_list,
-               pfc.weight AS factor_weight
+               pfc.weight AS factor_weight, pfc.idx AS factor_order
         FROM `tabEvaluation Factor` paf
         INNER JOIN `tabEvaluation Factor Setup` pfc ON pfc.factor = paf.name
         {conditions}
-        ORDER BY paf.name
+        ORDER BY pfc.idx
     """, values, as_dict=True)
 
 
