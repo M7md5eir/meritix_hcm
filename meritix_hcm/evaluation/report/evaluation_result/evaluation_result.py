@@ -38,7 +38,7 @@ def get_columns(factors):
     ]
     for f in factors:
         columns.append({"fieldname": f.name, "label": f.name, "fieldtype": "Percent", "width": 150, "align": "left"})
-    columns.append({"fieldname": "final_score", "label": _("Final Score"), "fieldtype": "Percent", "width": 175, "align": "left"})
+    columns.append({"fieldname": "final_score", "label": _("Final Score"), "fieldtype": "Percent", "width": 150, "align": "left"})
     return columns
 
 
