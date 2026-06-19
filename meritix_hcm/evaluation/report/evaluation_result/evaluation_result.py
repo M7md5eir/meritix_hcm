@@ -101,8 +101,7 @@ def get_data(filters, factors):
     for f in factors:
         factor_selects_parts.append(f"""
         , SUM(CASE WHEN e.evaluation_factor = '{f.name}' AND e.docstatus IN (0, 1) THEN e.score ELSE 0 END) AS `{f.name}_emp`
-        , SUM(CASE WHEN e.evaluation_factor = '{f.name}' AND e.docstatus IN (0, 1) THEN 1 ELSE 0 END) AS `{f.name}_emp_count`
-        , SUM(CASE WHEN e.evaluation_factor = '{f.name}' AND e.docstatus = 1 THEN 1 ELSE 0 END) AS `{f.name}_emp_submitted_count`
+        , SUM(CASE WHEN e.evaluation_factor = '{f.name}' AND e.docstatus IN (0, 1) THEN 1 ELSE 0 END) AS `{f.name}_emp_exists_count`
         """)
 
         if f.doctype_list == 'Organization' and f.structure_level:
@@ -126,22 +125,12 @@ def get_data(filters, factors):
             AND o.evaluation_factor = '{f.name}'
             AND o.evaluation_subject = e.`{field_name}`
             AND o.docstatus IN (0, 1)
-        ), 0) AS `{f.name}_org_count`
-        , COALESCE((
-            SELECT COUNT(*) FROM `tabEvaluation` o
-            WHERE o.evaluation_form = e.evaluation_form
-            AND o.evaluation_period = e.evaluation_period
-            AND o.evaluation_factor_doctype = 'Organization'
-            AND o.evaluation_factor = '{f.name}'
-            AND o.evaluation_subject = e.`{field_name}`
-            AND o.docstatus = 1
-        ), 0) AS `{f.name}_org_submitted_count`
+        ), 0) AS `{f.name}_org_exists_count`
             """)
         else:
             factor_selects_parts.append(f"""
         , 0 AS `{f.name}_org`
-        , 0 AS `{f.name}_org_count`
-        , 0 AS `{f.name}_org_submitted_count`
+        , 0 AS `{f.name}_org_exists_count`
             """)
 
     factor_selects = "".join(factor_selects_parts)
@@ -169,13 +158,14 @@ def get_data(filters, factors):
             "job": row.get('job'),
         }
         for f in factors:
-            emp_submitted_count = row.get(f'{f.name}_emp_submitted_count') or 0
-            org_submitted_count = row.get(f'{f.name}_org_submitted_count') or 0
+            emp_exists_count = row.get(f'{f.name}_emp_exists_count') or 0
+            org_exists_count = row.get(f'{f.name}_org_exists_count') or 0
             score = (row.get(f'{f.name}_emp') or 0) + (row.get(f'{f.name}_org') or 0)
             weight = factor_weights.get(f.name, 0)
             factor_final = (score * weight) / 100
             new_row[f.name] = factor_final
-            new_row[f'{f.name}_submitted'] = (emp_submitted_count + org_submitted_count) > 0
+            # submitted = True لو فيه أي evaluation (draft أو submitted) لهذا الـ factor
+            new_row[f'{f.name}_submitted'] = (emp_exists_count + org_exists_count) > 0
             final_score += factor_final
         new_row['final_score'] = final_score
         result.append(new_row)
