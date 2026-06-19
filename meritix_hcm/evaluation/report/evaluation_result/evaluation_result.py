@@ -1,68 +1,3 @@
-import frappe
-from frappe import _
-from frappe import scrub
-from structure_link.filters import apply_structure_filter
-
-
-def execute(filters=None):
-    filters = filters or {}
-    factors = get_factors(filters)
-    columns = get_columns(factors)
-    data = get_data(filters, factors)
-    return columns, data
-
-
-def get_factors(filters):
-    values = {}
-    conditions = ""
-    if filters.get('evaluation_form'):
-        conditions = "WHERE pfc.parent = %(evaluation_form)s AND pfc.parentfield = 'evaluation_factor_setup'"
-        values['evaluation_form'] = filters['evaluation_form']
-
-    return frappe.db.sql(f"""
-        SELECT DISTINCT paf.name, paf.structure_level, paf.doctype_list,
-               pfc.weight AS factor_weight, pfc.idx AS factor_order
-        FROM `tabEvaluation Factor` paf
-        INNER JOIN `tabEvaluation Factor Setup` pfc ON pfc.factor = paf.name
-        {conditions}
-        ORDER BY pfc.idx
-    """, values, as_dict=True)
-
-
-def get_columns(factors):
-    columns = [
-        {"fieldname": "evaluation_name",    "label": _("Evaluation"),    "fieldtype": "Link", "options": "Evaluation", "width": 120, "align": "left"},
-        {"fieldname": "evaluation_subject", "label": _("Emp ID"),        "fieldtype": "Link", "options": "Employee",   "width": 100, "align": "left"},
-        {"fieldname": "emp_name",           "label": _("Employee Name"), "fieldtype": "Data",                          "width": 300, "align": "left"},
-        {"fieldname": "job",                "label": _("Job"),           "fieldtype": "Data",                          "width": 300, "align": "left"},
-    ]
-    for f in factors:
-        columns.append({"fieldname": f.name, "label": f.name, "fieldtype": "Percent", "width": 150, "align": "left"})
-    columns.append({"fieldname": "final_score", "label": _("Final Score"), "fieldtype": "Percent", "width": 150, "align": "left"})
-    return columns
-
-
-def get_permitted_subjects(filters):
-    conditions = {
-        "evaluation_factor_doctype": "Employee",
-        "docstatus": ["in", [0, 1]]
-    }
-    if filters.get('evaluation_form'):
-        conditions['evaluation_form'] = filters['evaluation_form']
-    if filters.get('evaluation_period'):
-        conditions['evaluation_period'] = filters['evaluation_period']
-
-    records = frappe.get_list(
-        "Evaluation",
-        filters=conditions,
-        fields=["evaluation_subject"],
-        ignore_permissions=False,
-        limit=0
-    )
-
-    return list(set([r.evaluation_subject for r in records]))
-
-
 def get_data(filters, factors):
     if not factors:
         return []
@@ -94,7 +29,6 @@ def get_data(filters, factors):
     conditions += sc_cond
     values.update(sc_values)
 
-    # بناء map للـ factor weights
     factor_weights = {f.name: f.factor_weight or 0 for f in factors}
 
     factor_selects_parts = []
@@ -169,31 +103,25 @@ def get_data(filters, factors):
             "job": row.get('job'),
         }
         for f in factors:
+            emp_count = row.get(f'{f.name}_emp_count') or 0
+            org_count = row.get(f'{f.name}_org_count') or 0
             emp_submitted_count = row.get(f'{f.name}_emp_submitted_count') or 0
             org_submitted_count = row.get(f'{f.name}_org_submitted_count') or 0
+
             score = (row.get(f'{f.name}_emp') or 0) + (row.get(f'{f.name}_org') or 0)
             weight = factor_weights.get(f.name, 0)
             factor_final = (score * weight) / 100
             new_row[f.name] = factor_final
-            new_row[f'{f.name}_submitted'] = (emp_submitted_count + org_submitted_count) > 0
+
+            exists = (emp_count + org_count) > 0
+            submitted = (emp_submitted_count + org_submitted_count) > 0
+
+            # نلوّن فقط لو فيه تقييم موجود بس لسه مش submitted (Draft).
+            # لو مفيش تقييم أصلاً (أو ملغي) → اعتبره submitted عشان مايتلوّنش.
+            new_row[f'{f.name}_submitted'] = (not exists) or submitted
+
             final_score += factor_final
         new_row['final_score'] = final_score
         result.append(new_row)
 
     return result
-
-
-def _org_filter(filters):
-    node = filters.get("organization")
-    if not node:
-        return "", {}
-
-    if (filters.get("organization_match_mode") or "=") == "descendants of (inclusive)":
-        row = frappe.db.get_value("Organization", node, ["lft", "rgt"], as_dict=True)
-        if row and row.lft is not None:
-            return (
-                " AND o.organization IN (SELECT name FROM `tabOrganization` WHERE lft >= %(org_lft)s AND rgt <= %(org_rgt)s)",
-                {"org_lft": row.lft, "org_rgt": row.rgt},
-            )
-
-    return " AND o.organization = %(org_val)s", {"org_val": node}
