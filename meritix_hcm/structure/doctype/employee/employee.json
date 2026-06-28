@@ -13,6 +13,7 @@
   "emp_name",
   "join_date",
   "image",
+  "email",
   "tab1_sec1_col2",
   "tab1_sec1_col3",
   "tab1_sec2",
@@ -110,13 +111,19 @@
    "hidden": 1,
    "label": "Image",
    "make_attachment_public": 1
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "options": "Email"
   }
  ],
  "grid_page_length": 50,
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-14 23:37:23.730652",
+ "modified": "2026-06-28 11:26:18.024899",
  "modified_by": "Administrator",
  "module": "Structure",
  "name": "Employee",

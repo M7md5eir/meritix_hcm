@@ -23,6 +23,7 @@
   "emp_name",
   "position",
   "job",
+  "email",
   "image",
   "tab1_sec2_col2",
   "organization",
@@ -215,6 +216,14 @@
    "hidden": 1,
    "label": "Image",
    "read_only": 1
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Email",
+   "options": "Email",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
@@ -222,7 +231,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-06-16 13:54:16.350899",
+ "modified": "2026-06-28 11:53:18.403189",
  "modified_by": "Administrator",
  "module": "Evaluation",
  "name": "Evaluation",

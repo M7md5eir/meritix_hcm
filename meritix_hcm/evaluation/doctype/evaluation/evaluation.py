@@ -69,7 +69,7 @@ class Evaluation(Document):
 
 @frappe.whitelist()
 def get_subject_fields(evaluation_factor_doctype, evaluation_subject):
-    target_fields = ['organization', 'job', 'emp_name', 'position', 'image']
+    target_fields = ['organization', 'job', 'emp_name', 'position', 'image', 'email']
 
     field_to_doctype = {
         'organization': 'Organization',
